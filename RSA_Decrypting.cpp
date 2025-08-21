@@ -3,25 +3,25 @@
 #include <gmpxx.h>
 using bigInteger = mpz_class;
 using namespace std;
-struct trojka{
+struct triple{
     bigInteger d;
     bigInteger x;
     bigInteger y;
-    trojka(bigInteger x1,bigInteger x2,bigInteger x3){d=x1;x=x2;y=x3;}
+    triple(bigInteger x1,bigInteger x2,bigInteger x3){d=x1;x=x2;y=x3;}
 };
-trojka odwrotny(bigInteger a,bigInteger b,bigInteger N){
+triple inverse(bigInteger a,bigInteger b,bigInteger N){
     bigInteger x(0);
-    trojka t(bigInteger(0),bigInteger(0),bigInteger(0));
+    triple t(bigInteger(0),bigInteger(0),bigInteger(0));
     if(b==bigInteger(0))
-        return trojka(bigInteger(a),bigInteger(1),bigInteger(0));
+        return triple(bigInteger(a),bigInteger(1),bigInteger(0));
     else
-        t=odwrotny(b,a%b,N);
-    trojka tt(t.d,t.y,t.x-(a/b)*t.y);
+        t=inverse(b,a%b,N);
+    triple tt(t.d,t.y,t.x-(a/b)*t.y);
     if(tt.x<bigInteger(0))
         tt.x+=N;
     return tt;
 }
-//funkcja obliczająca M^d mod N (gdzie M to przesyłana wiadomość, (N,d)-klucz prywatny)
+
 bigInteger powermod(bigInteger M,bigInteger d,bigInteger N){
     bigInteger z=M%N;
     bigInteger m=d;
@@ -36,24 +36,24 @@ bigInteger powermod(bigInteger M,bigInteger d,bigInteger N){
     return y;
 }
 int main(){
-    //klucz publiczny
+    //public key
     bigInteger N("1125907426181141");
     bigInteger e(65537);
     //-------------------
     bigInteger p("1048583");
     bigInteger q("1073741827");
     bigInteger phiN=(p-1)*(q-1);
-    //klucz prywatny
-    bigInteger d=odwrotny(e,phiN,phiN).x;
+    //private key
+    bigInteger d=inverse(e,phiN,phiN).x;
     //----------------------
-    //dane do deszyfrowania
-    bigInteger zaszyfrowane_M1("58467865012426");
-    bigInteger zaszyfrowane_M2("930815517522533");
+    //data for decryption
+    bigInteger encrypted_M1("58467865012426");
+    bigInteger encrypted_M2("930815517522533");
     //------------------------
-    bigInteger M1=powermod(zaszyfrowane_M1,d,N);
-    bigInteger M2=powermod(zaszyfrowane_M2,d,N);
-    ofstream plik_deszyfrowane_dane;
-    plik_deszyfrowane_dane.open("/Users/iszla/CLionProjects/dyskretna/output.txt");//otwieram plik do wypisywania danych deszyfrowanych
+    bigInteger M1=powermod(encrypted_M1,d,N);
+    bigInteger M2=powermod(encrypted_M2,d,N);
+    ofstream decrypted_data;
+    decrypted_data.open("/Users/iszla/Discrete-Mathematics-Algorithms/output.txt");
     string M="";
     while(M1>0){
         bigInteger m=M1%100;
@@ -140,7 +140,7 @@ int main(){
             M=' '+M;
         }
     }
-    plik_deszyfrowane_dane<<M;
+    decrypted_data << M;
     M="";
     while(M2>0){
         bigInteger m=M2%100;
@@ -227,6 +227,6 @@ int main(){
             M=' '+M;
         }
     }
-    plik_deszyfrowane_dane<<M<<endl;
-    plik_deszyfrowane_dane.close();//zamykam plik
+    decrypted_data << M << endl;
+    decrypted_data.close();
 }

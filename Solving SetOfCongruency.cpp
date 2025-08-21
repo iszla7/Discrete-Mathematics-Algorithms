@@ -4,20 +4,20 @@
 using bigInteger = mpz_class;
 using namespace std;
 
-struct trojka{
+struct triple{
     bigInteger d;
     bigInteger x;
     bigInteger y;
-    trojka(bigInteger x1,bigInteger x2,bigInteger x3){d=x1;x=x2;y=x3;}
+    triple(bigInteger x1,bigInteger x2,bigInteger x3){d=x1;x=x2;y=x3;}
 };
-trojka odwrotny(bigInteger a,bigInteger b,bigInteger N){
+triple inverse(bigInteger a,bigInteger b,bigInteger N){
     bigInteger x(0);
-    trojka t(bigInteger(0),bigInteger(0),bigInteger(0));
+    triple t(bigInteger(0),bigInteger(0),bigInteger(0));
     if(b==bigInteger(0))
-        return trojka(bigInteger(a),bigInteger(1),bigInteger(0));
+        return triple(bigInteger(a),bigInteger(1),bigInteger(0));
     else
-        t=odwrotny(b,a%b,N);
-    trojka tt(t.d,t.y,t.x-(a/b)*t.y);
+        t=inverse(b,a%b,N);
+    triple tt(t.d,t.y,t.x-(a/b)*t.y);
     if(tt.x<bigInteger(0))
         tt.x+=N;
     return tt;
@@ -34,13 +34,13 @@ void linsolve(const bigInteger& a, const bigInteger& b, const bigInteger& n)
 {
     bigInteger nwd=gcd(a,n);
     if(b%nwd!=bigInteger(0))
-        cout<<"BRAK ROZWIĄZAŃ"<<endl;
+        cout<<"SOLUTION DOES NOT EXIST"<<endl;
     else {
         bigInteger i(1);
         bigInteger a1=a/nwd;
         bigInteger b1=b/nwd;
         bigInteger n1=n/nwd;
-        bigInteger x=((odwrotny(a1, n1, n1).x)*b1)%n1;
+        bigInteger x=((inverse(a1, n1, n1).x)*b1)%n1;
         cout<<x<<endl;
         while(i<nwd) {
             x=x+n1;
@@ -62,22 +62,22 @@ void crt(bigInteger a[], bigInteger n[], int k)
                 flag=false;
                 break;
             }
-            bigInteger pom=n[i]*n[j]/d;
-            nww=pom*nwwp/gcd(pom,nwwp);
+            bigInteger temp=n[i]*n[j]/d;
+            nww=pom*nwwp/gcd(temp,nwwp);
             nwwp=nww;
         }
         if(!flag)
             break;
     }
     if(!flag){
-        cout<<"UKŁAD JEST SPRZECZNY"<<endl;
+        cout<<"SYSTEM IS CONTRADICTORY"<<endl;
     }
     else{
         bigInteger* b=new bigInteger[k];
         bigInteger* y=new bigInteger[k];
         bigInteger m(0);
         for(int i=0;i<k;i++){
-            b[i]=odwrotny((nww/n[i]),n[i],n[i]).x;
+            b[i]=inverse((nww/n[i]),n[i],n[i]).x;
             y[i]=b[i]*(nww/n[i]);
             m=m+a[i]*y[i];
         }
@@ -91,7 +91,6 @@ int main()
     bigInteger a[k];
     bigInteger n[k];
 
-    // Dane z zadania:
 
     a[0] = bigInteger("17");
     a[1] = bigInteger("15");

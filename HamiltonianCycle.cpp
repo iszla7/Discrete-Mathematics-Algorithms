@@ -4,12 +4,12 @@
 
 using namespace std;
 
-const int N = 8;              // liczba wierzcholkow
-list <int> adj_list[N+1];     // listy sasiedztwa. Wierzcholki NUMERUJEMY OD 1
+const int N = 8;
+list <int> adj_list[N+1];
 
-bool DOPUSZCZALNE[N + 1];
+bool ALLOWED[N + 1];
 
-int X[N + 1];                  // X[1..k] zawiera sciezke X[1],X[2],...,X[k]
+int X[N + 1];                  // X[1..k] contains path X[1],X[2],...,X[k]
 
 void add_edge (int u,int v)
 {
@@ -35,12 +35,12 @@ bool hamilton_cycle(int k)
     }
     else{
         for(int u:adj_list[X[k-1]]){
-            if(DOPUSZCZALNE[u]){
+            if(ALLOWED[u]){
                 X[k]=u;
-                DOPUSZCZALNE[u]=false;
+                ALLOWED[u]=false;
                 if(hamilton_cycle(k+1))
                     return true;
-                DOPUSZCZALNE[u]=true;
+                ALLOWED[u]=true;
             }
         }
         return false;
@@ -49,15 +49,15 @@ bool hamilton_cycle(int k)
 
 
 
-// Ponizsza funcja wypisuje przykladowy cykl Hamiltona rozpoczynajacy
-// sie od start_vertex lub informuje, ze takowego nie ma.
+/* This function finds the example of Hamiltonian cycle starting
+ in start_vertex or informs that such cycle does not exist*/
 
 void find_hamilton_cycle(int start_vertex)
 {
     for(int ii=1;ii<=N;ii++){
-        DOPUSZCZALNE[ii]=true;
+        ALLOWED[ii]=true;
     }
-    DOPUSZCZALNE[start_vertex]=false;
+    ALLOWED[start_vertex]=false;
     X[1]=start_vertex;
     bool flag=hamilton_cycle(2);
     if(flag) {
@@ -67,7 +67,7 @@ void find_hamilton_cycle(int start_vertex)
         cout<<X[1]<<endl;
     }
     else{
-        cout<<"NIE MA CYKLU HAMILTONA"<<endl;
+        cout<<"HAMILTONIAN CYCLE DOES NOT EXIST"<<endl;
     }
 }
 

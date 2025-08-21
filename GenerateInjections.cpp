@@ -29,7 +29,7 @@ void nextpermutation(int n,int* tab){
     }
 }
 void nextcomb(int N,int k,int* tab,int fn){
-    //permutacji
+    //permutations
     int* tab1=new int[k];
     for(int g=0;g<k;g++){
         tab1[g]=tab[g];
@@ -42,16 +42,12 @@ void nextcomb(int N,int k,int* tab,int fn){
         tab[g]=tab1[g];
     }
     delete[] tab1;
-    //kombinuje nowa kombinacje
+    //new combination
     for(int i=k-1;i>=0;i--){
         if(tab[i]<N-k+i+1){
             tab[i]++;
             for(int j=i+1;j<k;j++)
                 tab[j]=tab[j-1]+1;
-            /*for(int i=0;i<k;i++)
-                cout<<tab[i]<<" ";
-            cout<<endl;
-            cout<<"---------"<<endl;*/
             break;
         }
     }
@@ -60,7 +56,7 @@ int main(){
     int n,k;
     cin>>n>>k;
     if(k<n)
-        cout<<"Nie istnieje żadna injekcja!"<<endl;
+        cout<<"INJECTIVE MAP DOES NOT EXIST"<<endl;
     int fn=fact(n);
     int fk=fact(k);
     int fnk=fact(k-n);
@@ -69,7 +65,7 @@ int main(){
     for(int i=0;i<n;i++){
         tab[i]=i+1;
     }
-    //cout<<komb<<endl;
+
     for(int i=0;i<komb;i++){
         nextcomb(k,n,tab,fn);
     }

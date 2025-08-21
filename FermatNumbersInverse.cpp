@@ -1,7 +1,7 @@
 #include <iostream>
 #include <gmpxx.h>
 using namespace std;
-using bigInteger = mpz_class; // bardziej czytelnie jest poslugiwac sie bigInteger niz mpz_class
+using bigInteger = mpz_class;
 //typedef mpz_class bigInteger;
 class triple{
 public:
@@ -54,12 +54,12 @@ int main() {
     bigInteger m(mm);
     bigInteger i(0);
     bigInteger M(fastPower(bigInteger(2), fastPower(bigInteger(2), m)) + bigInteger(1));
-    cout<<"Liczba F_"<<m<<" ma "<< M.get_str().length() <<" cyfr"<< endl;
+    cout<<"F_"<<m<<" has "<< M.get_str().length() <<" digits"<< endl;
     while (i < m) {
-        cout<<"Odwrotność F_"<<i<<" ma ";
+        cout<<"Inverse F_"<<i<<" has ";
         bigInteger a1(fastPower(bigInteger(2), i));
         bigInteger fi(inverse(fastPower(bigInteger(2), a1) + bigInteger(1), M));
-        cout << fi.get_str().length() <<" cyfr"<< endl;
+        cout << fi.get_str().length() <<" digits"<< endl;
         i++;
     }
 }

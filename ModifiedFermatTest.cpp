@@ -6,7 +6,7 @@
 using namespace std;
 typedef mpz_class bigInteger;
 
-/* LICZBY PESUDOLOSWE */
+/* PSEUDORANDOM NUMBERS */
 gmp_randclass rr(gmp_randinit_default);
 
 void initalize_random()
@@ -31,12 +31,12 @@ bigInteger powermod(bigInteger M,bigInteger e,bigInteger N){
     }
     return y;
 }
-void modyfikowany_fermat_test(bigInteger n, int no_of_trials) {
+void modified_fermat_test(bigInteger n, int no_of_trials) {
     int i = 1;
     while (i <= no_of_trials) {
         bigInteger a = randomInt(bigInteger(2), n);
         if (powermod(a, n - 1, n) != bigInteger(1)) {
-            cout << "swiadek: \n" << a << "\n" << gcd(a, n) << endl;
+            cout << "witness: \n" << a << "\n" << gcd(a, n) << endl;
         }
         i++;
     }
@@ -45,5 +45,5 @@ int main()
 {
     initalize_random();
     bigInteger a("1590231231043178376951698401");
-    modyfikowany_fermat_test(a,20);
+    modified_fermat_test(a,20);
 }

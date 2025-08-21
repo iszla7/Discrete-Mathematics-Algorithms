@@ -3,9 +3,9 @@
 #include <list>
 #include <queue>
 using namespace std;
-const int N = 8;                // liczba wierzcholkow
-list<int> adj_list[N+1];        // listy sasiedztwa. Wierzcholki NUMERUJEMY OD 1
-int label[N+1];                 // numer klasy danego wierzcholka.
+const int N = 8;
+list<int> adj_list[N+1];
+int label[N+1];
 
 void add_edge (int u, int v)
 {
@@ -68,11 +68,11 @@ int main()
 
     if (is_bipartite())
     {
-        cout << "Graf jest dwudzielny. Podzial na klasy: " << endl;
+        cout << "Graph is bipartite. Group division: " << endl;
         show_labels();
     }
     else
-        cout << "Graf nie jest dwudzielny!";
+        cout << "Graph is not bipartite.";
 
     return 0;
 }

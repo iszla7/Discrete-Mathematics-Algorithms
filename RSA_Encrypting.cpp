@@ -5,7 +5,6 @@
 #include <cmath>
 using bigInteger = mpz_class;
 using namespace std;
-//funkcja obliczająca M^e mod N (gdzie M to przesyłana wiadomość, (N,e)-klucz publiczny)
 bigInteger powermod(bigInteger M,bigInteger e,bigInteger N){
     bigInteger z=M%N;
     bigInteger m=e;
@@ -19,7 +18,7 @@ bigInteger powermod(bigInteger M,bigInteger e,bigInteger N){
     }
     return y;
 }
-//funkcja dzieląca tekst z tekstu wpisanego do s na bloki o dlugości co najwyzej k(ostatni może być krótszy) i zwraca wektor ,w którym każdy element odpowiada pewnemu bloku danych
+
 vector<string> divide_str(string s,int K){
     int N=s.size();
     int j=0;
@@ -36,33 +35,33 @@ vector<string> divide_str(string s,int K){
     return result;
 }
 int main(){
-    //część odpowiadająca za wczytywanie danych z pliku
-    string s="";//string dla przechowywania tekstu z pliku
-    string linia="";//pomoczniczy string żeby wczytywać kolejne linii z pliku
-    fstream plik_wczytywanie_danych;
-    plik_wczytywanie_danych.open("/Users/iszla/CLionProjects/dyskretna/input.txt");//otwieram plik
-    if(plik_wczytywanie_danych.is_open()) {//jeśli plik się otworzył
-        while (getline(plik_wczytywanie_danych, linia)) {//wczytuje kolejne linie
-            s = s + linia;//dopisuje do calości
+
+    string s="";
+    string str="";
+    fstream input;
+    input.open("/Users/iszla/Discrete-Mathematics-Algorithms/input.txt");
+    if(input.is_open()) {
+        while (getline(input, str)) {
+            s = s + str;
         }
     }
-    plik_wczytywanie_danych.close();//zamykam plik
+    input.close();
     //----------------------------------------------------
-    int m=4;//dlugosc wczytywanych blokow
-    //dane dla k ostatnich losowanych bitow
+    int m=4;
+
     int k=5;
-    int zakres_losowania=pow(10,k);//pózniej będę losować za pomocą komendy rand()%zakres_losowania liczby 5-elementowe żeby dodawać na koniec linii
+    int scope = pow(10,k);
     //-------------------
-    //klucz publiczny
+    //public key
     bigInteger N("1125907426181141");
     bigInteger e(65537);
     //-------------------
-    vector <string> v=divide_str(s,m);//dziele wczytany tekst na bloki i wszystkie te bloki przechowuje w wektorze
-    ofstream plik_zaszyfrowane_dane;
-    plik_zaszyfrowane_dane.open("/Users/iszla/CLionProjects/dyskretna/output.txt");//otwieram plik do wypisywania danych zaszyfrowanych
-    for(int i=0;i<v.size();i++){//dopóki wszystkie bloki nie zostaną zaszyfrowane
-        string M="";//string do ktorego wpisuje ten blok w postaci liczby(każdej literze odpowiada pewna liczba)
-        for(int h=0;h<v[i].size();h++){//w tej pętli przerabiam tekst na liczbę
+    vector <string> v=divide_str(s,m);
+    ofstream encrypted_data;
+    encrypted_data.open("/Users/iszla/Discrete-Mathematics-Algorithms/output.txt");
+    for(int i=0;i<v.size();i++){
+        string M="";
+        for(int h=0;h<v[i].size();h++){
             if(v[i][h]=='A'){
                 M+="10";
             }
@@ -145,10 +144,10 @@ int main(){
                 M+="36";
             }
         }
-        bigInteger MM(M);//tworze liczbe bigInteger z tego obiektu typu string w którym przepisany jest tekst w postaci liczby
-        int ostatnie_k_losowanych_cyfr=rand() % zakres_losowania;//losuje k-cyfrową liczbę żeby dodac na koniec zaszyfrowanego bloku
-        plik_zaszyfrowane_dane <<powermod(MM,e,N)<<ostatnie_k_losowanych_cyfr<<endl;//wypisuje do pliku zaszyfrowany za pomocą funkcji powermod blok(M^e  mod N) oraz k-elementową losową liczbę
+        bigInteger MM(M);
+        int last_k_random_digits = rand() % scope;
+        encrypted_data << powermod(MM,e,N) << last_k_random_digits << endl;
     }
-    plik_zaszyfrowane_dane.close();//zamykam plik
+    encrypted_data.close();
 }
 

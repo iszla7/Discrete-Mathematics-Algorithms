@@ -6,7 +6,7 @@
 using namespace std;
 typedef mpz_class bigInteger;
 
-/* LICZBY PESUDOLOSWE */
+/* PSEUDORANDOM NUMBERS */
 gmp_randclass rr(gmp_randinit_default);
 
 void initalize_random()
@@ -43,7 +43,7 @@ bigInteger powermod(bigInteger M,bigInteger e,bigInteger N){
     }
     return y;
 }
-//TEST MILLERA_RABINA
+//MILLERA_RABINA TEST
 bool PrimeTest(bigInteger n,int no_of_trials){
     bigInteger r(0);
     bigInteger nn=n-1;
@@ -75,8 +75,8 @@ int main()
     for(int i=1;i<=15;i++){
         bigInteger F(fastPower(bigInteger(2), fastPower(bigInteger(2), i)) + bigInteger(1));
         if(PrimeTest(F,15))
-            cout<<"Liczba F_"<<i<<" jest prawdopodobnie pierwsza"<<endl;
+            cout<<"F_"<<i<<" can be prime"<<endl;
         else
-            cout<<"Liczba F_"<<i<<" jest złożona"<<endl;
+            cout<<"F_"<<i<<" is not prime"<<endl;
     }
 }

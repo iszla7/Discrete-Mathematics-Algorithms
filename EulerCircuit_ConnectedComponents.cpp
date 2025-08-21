@@ -4,8 +4,8 @@
 #include <vector>
 using namespace std;
 
-const int N = 18;              // liczba wierzcholkow
-list<int> adj_list[N+1];       // listy sasiedztwa. Wierzcholki NUMERUJEMY OD 1
+const int N = 18;
+list<int> adj_list[N+1];
 
 void add_edge (int u, int v)
 {
@@ -26,27 +26,27 @@ void construct_graph()
     add_edge(16, 17); add_edge(16, 18);
 }
 vector<int> euler_circuit(int start_vertex){
-    stack<int> stos;
+    stack<int> stack;
     vector<int> v;
-    stos.push(start_vertex);
-    while(!stos.empty()){
-        start_vertex=stos.top();
+    stack.push(start_vertex);
+    while(!stack.empty()){
+        start_vertex=stack.top();
         if(!adj_list[start_vertex].empty()){
             int u=adj_list[start_vertex].back();
-            stos.push(u);
+            stack.push(u);
             adj_list[u].remove(start_vertex);
             adj_list[start_vertex].remove(u);
         }
         else {
-            stos.pop();
+            stack.pop();
             v.push_back(start_vertex);
         }
     }
     return v;
 }
-void rozklad_na_skladowe_spojne(int start_vertex){
+void connected_components_division(int start_vertex){
     vector<int> v=euler_circuit(start_vertex);
-    stack<int> pomocniczy;
+    stack<int> temp;
     bool tab[N+1];
     for(int i=1;i<N+1;i++)
         tab[i]=0;
@@ -55,15 +55,15 @@ void rozklad_na_skladowe_spojne(int start_vertex){
         start_vertex=v[i];
         if(tab[start_vertex]){
             cout<<start_vertex<<" ";
-            while(pomocniczy.top()!=start_vertex){
-                cout<<pomocniczy.top()<<" ";
-                tab[pomocniczy.top()]=0;
-                pomocniczy.pop();
+            while(temp.top()!=start_vertex){
+                cout<<temp.top()<<" ";
+                tab[temp.top()]=0;
+                temp.pop();
             }
             cout<<start_vertex<<endl;
         }
         else{
-            pomocniczy.push(start_vertex);
+            temp.push(start_vertex);
             tab[start_vertex]=1;
         }
     }
@@ -71,6 +71,6 @@ void rozklad_na_skladowe_spojne(int start_vertex){
 int main()
 {
     construct_graph();
-    rozklad_na_skladowe_spojne(3);
+    connected_components_division(3);
     return 0;
 }

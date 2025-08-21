@@ -3,26 +3,31 @@
 #include <vector>
 #include <fstream>
 using namespace std;
-//MODEL MATEMATYCZNY
+//MATHEMATICAL MODEL
 /*
-Problem podany w zadaniu sprowadza się do problemu kolorowania wierzchołków grafa nieskierowanego oraz szukanie najwiekszego(względem ilości wierzchołków) podgrafu, który jest kliką.
-Odpady identyfikuję jako wierzchołki grafu nieskierowanego,ten fakt,że odpady a i b nie mogą byc przewożone razem, identyfikuje jako to, że w grafie istenieje krawędż ab.
- Więc, problem znalezienia minimalnej liczby samochodów potrzebnych dla wywożenia odpadów sprowadza się do znalezienia liczby chromatycznej grafu,problem znalezienia przykładowego
- przydziału odpadów do samochodów sprowadza się do znalezienia przykładowego kolorowania grafu.
- Natomiast problem wyszukiwania rozmiaru oraz przykładu największego niebiezpiecznego układu sprowadza się do wyszukiwania rozmiaru oraz przykładu największego podgrafa zupenego.
+The problem given in the task boils down to the problem of coloring the vertices of an undirected graph
+and finding the largest (in terms of number of vertices) subgraph that is a clique.
+The waste items are identified as vertices of an undirected graph. The fact that wastes a and b cannot be transported together
+means that there is an edge between a and b in the graph.
+Therefore, the problem of finding the minimum number of trucks needed to remove the waste reduces to finding the chromatic number of the graph.
+The problem of finding an example allocation of waste to trucks becomes the problem of finding an example graph coloring.
+The problem of finding the size and an example of the largest dangerous configuration becomes the problem of finding the size
+and an example of the largest complete subgraph (clique).
+*/
 
- */
-vector<int> maksymalny_niebiezpieczny_uklad;//wektor dla przechowywania maksymalnego niebiezpiecznego układu(kliki)
-//funkcja do sprawdzenia czy można pokolorować podany wierzchołek podanym kolorem
+vector<int> maximum_clique;//vector for storing the maximal dangerous configuration (clique)
+//Function to check whether a vertex can be colored with a given color
+
 bool CanBeColored(int color,int* colors,int k,const list<int>* adj_list){
-    for(int u:adj_list[k]){//przechodzę po liście sąsiedztwa i sprawdzam czy jakiś wierzchołek sąsiedni z wierzchołkiem k ze zbioru {1,...,k-1} jest pokolorowany tym samym kolorem
+    for(int u:adj_list[k]){ //go through the adjacency list and check whether any adjacent vertex (from 1,...,k-1) is already colored with the same color
         if(u<k&&colors[u]==color) {
             return false;
         }
     }
     return true;
 }
-//funckje z pliku do sprawdzenia czy da sie pokolorować graf
+//Function to check if the graph can be colored
+
 bool colorGraph(int k,int no_of_cols,int* colors,int N,const list<int>* adj_list){
     if(k==N+1)
         return true;
@@ -44,28 +49,36 @@ bool isColorable(int no_of_cols,int* colors,int N,const list<int>* adj_list){
     return colorGraph(2,no_of_cols,colors,N,adj_list);
 }
 //=====================================================
-//funckja sprawdzająca czy wierzchołek v tworzy klikę z już dodanymi do kliki wierzchołkami(sprawdzam tylko czy istnieją krawędzi między tym wierzchołkiem i już dodanymi wierżchołkami,bo skoro wywołuję funkcje rekurencyjnie to wiem że dodanę wcześniej wierzchołki tworzą klikę)
-bool Check(int v,bool* klika,const list<int>* adj_list,int N){
+
+//Function that checks whether vertex v creates a clique with already added vertices
+//(only checking whether edges exist between this vertex and already added ones,
+//because recursive calls guarantee that previously added vertices form a clique)
+bool Check(int v,bool* clique,const list<int>* adj_list,int N){
     for(int i=1;i<N+1;i++){
-        if(klika[i]&&find(adj_list[v].begin(),adj_list[v].end(),i)==adj_list[v].end())
+        if(clique[i] && find(adj_list[v].begin(),adj_list[v].end(),i) == adj_list[v].end())
             return false;
     }
     return true;
 }
-//ogólna idea poniższego algorytmu
+
+//General idea of the below algorithm
 /*
- skoro wierzchołki polączone krawędzią nie mogą byc pokolorowane tym samy kolorem więc jak dodaje do bieżacej kliki wierzchołek kolora i to już nie mogę dodać żadnego wierzchołku w tym samym kolorze.
- Więc w kazdym kroku rekurencyjnym przechodzę po wszystkich wierzchołkach w kolorze color i sprawdzam czy ten wierzchołek tworzy z już dodanymi wierzchołkami bieżacej kliki za pomocą pomocniczej funkcji Check.
- Dalej rekurencyjnie wywołuję funkcję dla koloru (color+1) i ilości wierzchołków (n+1) i sprawdzam czy otrzymany wynik jest większy niż rozmiar bieżącej kliki oraz czy udało się otrzymać coś większe niż bieżący maks.
- Spawdzam czy bieżąca klika ma rozmiar większy niż poprzednia maksymalna i jeśli tak jest to przepisuje tą klikę do specjalnego wektora.
- Oznaczam bieżacy wierzchołek jako false tym samym usuwając go z bieżacej kliki,żeby sprawdzić rozmiary klik tworzonych za pomocą innych wierzchołków w tym samym kolorze.
- Może też zajśc sytuacja taka że maksymalną klika zawiera naprzykład wierzchołki w kolorach 1,2,4,...Więc,na końcu funckji sprawdzam czy uzyskany już maks jest mniejszy niż
- suma ilości kolorów większych od bieżącego oraz ilości wierzchołków w bieżacej klicę(bo rozmiar maksymalnej kliki,który można uzyskać w wywołaniu funkcji dla ilości wierzchołków n i
- koloru (color+1), jest równa no_of_colors-(color+1)+1+n=no_of_colors-color+n,więc jesli max jest większy lub równy tej liczbie to nie ma sensu w tym wywołaniu)
- */
+Since vertices connected by an edge cannot be colored with the same color, when I add a vertex of color i to the current clique,
+I can no longer add any other vertex of the same color.
+So in each recursive step, I go through all vertices of the current color and check whether the vertex forms a clique
+with already added vertices using the helper function Check.
+Then I recursively call the function for color+1 and number of vertices n+1 and check whether the obtained result is greater than the current maximum.
+I check whether the current clique is larger than the previously found maximum clique, and if it is, I save it into a special vector.
+I mark the current vertex as false to remove it from the current clique, in order to check sizes of cliques formed by other vertices of the same color.
+It might also happen that the maximum clique contains, for example, vertices with colors 1,2,4,...
+So, at the end of the function I check whether the already found maximum is smaller than the sum of remaining colors
+and the number of vertices in the current clique
+(because the maximum size of a clique obtainable in the function call for number of vertices n and color+1 is
+no_of_colors - color + n, so if max is already >= this, further recursion doesn't make sense)
+*/
 int FindMaxClique(int no_of_colors,int N,bool* clique,int color,int n,vector<vector<int>> coloring,const list<int>* adj_list){
     int M=0;
-    if(color>no_of_colors)//baza rekurencji
+    if(color>no_of_colors)
         return 0;
     for(int j=0;j<coloring[color].size();j++){
         if(Check(coloring[color][j],clique,adj_list,N)) {
@@ -73,13 +86,13 @@ int FindMaxClique(int no_of_colors,int N,bool* clique,int color,int n,vector<vec
             int m1=FindMaxClique(no_of_colors,N,clique,color+1,n+1,coloring,adj_list);
             m1=max(n+1,m1);
             M=max(M,m1);
-            if(M>maksymalny_niebiezpieczny_uklad.size()){
+            if(M>maximum_clique.size()){
                 vector<int> v;
                 for(int i=1;i<N+1;i++){
                     if(clique[i])
                         v.push_back(i);
                 }
-                maksymalny_niebiezpieczny_uklad=v;
+                maximum_clique=v;
             }
             clique[coloring[color][j]]=false;
         }
@@ -91,27 +104,26 @@ int FindMaxClique(int no_of_colors,int N,bool* clique,int color,int n,vector<vec
     return M;
 }
 int main() {
-    //część, odpowiadająca za wczytywanie danych z pliku
+
     fstream f;
-    f.open("dane.txt",ios::in);//otwieram plik w trybie wczytywania
+    f.open("/Users/iszla/Discrete-Mathematics-Algorithms/data.txt,ios::in);
     string s;
-    if(f.is_open()) {//jesli plik sie otworzył to wczytuję dane z pliku i puszczam dla tych danych program
+    if(f.is_open()) {
         getline(f, s);
-        //wczytywanie liczby wierzchołków
+
         int N=0;
         for (char c : s){
             if (c >= '0' && c <= '9') {
                 N = N * 10 + (c - '0');
             }
         }
-        //--------------------
-        //wczytywanie krawędzi
+
         list<int> adj_list[N + 1];
         while(getline(f, s)){
             int a=0;
             int b=0;
-            string v1="";//odpowiada za wirzchołek v1 w krawędzi v1v2
-            string v2="";//odpowiada za wirzchołek v2 w krawędzi v1v2
+            string v1="";
+            string v2="";
             for(int i=0;i<s.size();i++){
                 if(s[i]==' '){
                     v1.append(s,0,i);
@@ -129,38 +141,38 @@ int main() {
                     b = b * 10 + (c - '0');
                 }
             }
-            //dodaję do list sąsiedztwa otrzymane wierzcholki
+
             adj_list[a].push_back(b);
             adj_list[b].push_back(a);
         }
-        f.close();//zamykam plik
-        int* colors = new int[N + 1];//tablica do przechowywania kolorów wierzchołków
-        vector <vector<int>> v;//wektor dwuwymiarowy dla przechowywania kolorowania(przyda sie póżniej)Każdy wiersz odpowiada koloru
+        f.close();
+        int* colors = new int[N + 1];
+        vector <vector<int>> v;
         vector<int> vv;
         v.push_back(vv);
         for (int i = 1; i <= N; i++) {
             vector<int> vv;
-            v.push_back(vv);//dodaje wierszy do tego momentu jak nie otrzymam dobre kolorowanie
-            if (isColorable(i, colors, N, adj_list)){//sprawdzam czy da się pokolorować graf za pomocą i kolorów(0<=i<=N)
-                //jeśli się da pokolorować to wypisuje pokolorowanie w odpowiedni sposób oraz przepisuje do wektora w ten sposób, że w wierszu i znajdują sie wierzchołki pokolorowane w kolor i
+            v.push_back(vv);//add rows until a proper coloring is found
+            if (isColorable(i, colors, N, adj_list)){//check if the graph can be colored with i colors (0 <= i <= N)
+                //if it can be colored, print the coloring and store it in the vector so that row i contains all vertices colored with color i
                 for(int c=1;c<=i;c++){
-                    cout<<"Samochód "<<c<<": ";
+                    cout << c << ": ";
                     for(int i=1;i<=N;i++){
                         if(colors[i]==c) {
                             v[c].push_back(i);
                             cout << i <<" ";
                         }
                     }
-                    cout<<endl;
+                    cout << endl;
                 }
-                //pomocnicza tablica typu bool do przechowywania bieżącego niebiezpiecznego układu w funkcji znajdz_klike
+
                 bool* tab=new bool[N+1];
                 for(int j=1;j<N+1;j++)
-                    tab[j]=false;//ustawiam wszystkie wartości na false bo na początku biezący układ ma być pusty;
-                cout<<"Maksymalny niebiezpieczny układ ma "<<FindMaxClique(i,N,tab, 1,0, v, adj_list)<<" elementy"<<endl;//drukuje ilość wierzchołków w maksymalnym niebizepiecznym układzie
-                cout<<"Przykładowy taki układ: ";
-                for(int k=0;k<maksymalny_niebiezpieczny_uklad.size();k++) {//drukuje przykładowy układ
-                    cout <<maksymalny_niebiezpieczny_uklad[k]<< " ";
+                    tab[j]=false;
+                cout<<"Maximum clique has "<<FindMaxClique(i,N,tab, 1,0, v, adj_list)<<" vertices"<<endl;
+                cout<<"Example of such clique: ";
+                for(int k=0;k<maximum_clique.size();k++) {
+                    cout <<maximum_clique[k]<< " ";
                 }
                 cout<<endl;
                 delete[] tab;
